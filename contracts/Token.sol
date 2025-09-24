@@ -34,13 +34,8 @@ contract Token {
         address _to,
         uint256 _value
     ) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value, "Token insufficient funds.");
-        require(_to != address(0), "Token: Recipient is address 0.");
-        balanceOf[msg.sender] -= _value;
-        balanceOf[_to] += _value;
-
-        emit Transfer(msg.sender, _to, _value);
-        return true;
+        require(_to != address(0), "Token: recipient is address 0.");
+        return _transfer(msg.sender, _to, _value);
     }
 
     function transferFrom(
@@ -48,7 +43,29 @@ contract Token {
         address _to,
         uint256 _value
     ) public returns (bool success) {
-        require(allowance[_from][msg.sender] == _value, "");
+        require(_from != address(0), "Token: sender is address 0.");
+        require(_to != address(0), "Token: recipient is address 0.");
+        require(balanceOf[_from] >= _value, "Token: insufficient funds.");
+        require(
+            allowance[_from][msg.sender] >= _value,
+            "Token: funds not allowed."
+        );
+
+        allowance[_from][msg.sender] -= _value;
+        return _transfer(_from, _to, _value);
+    }
+
+    function _transfer(
+        address _from,
+        address _to,
+        uint256 _value
+    ) internal returns (bool success) {
+        require(balanceOf[_from] >= _value, "Token: insufficient funds.");
+
+        balanceOf[_from] -= _value;
+        balanceOf[_to] += _value;
+
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
@@ -56,8 +73,8 @@ contract Token {
         address _spender,
         uint256 _value
     ) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value, "Token insufficient funds.");
-        require(_spender != address(0), "Token: Spender is address 0.");
+        require(_spender != address(0), "Token: spender is address 0.");
+        require(balanceOf[msg.sender] >= _value, "Token: insufficient funds.");
         allowance[msg.sender][_spender] = _value;
 
         emit Approval(msg.sender, _spender, _value);
