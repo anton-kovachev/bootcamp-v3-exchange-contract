@@ -5,16 +5,12 @@ const {
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const { deployTokenFixture, transferFromTokenFixture } = require("./Helpers/TokenFixtures");
+const { deployTokenFixture, transferFromTokenFixture, tokens } = require("./Helpers/TokenFixtures");
 
 describe("Token", () => {
     const NAME = "Dapp University";
     const SYMBOL = "DAPP";
     const DECIMALS = 18;
-
-    const tokens = (n) => {
-        return ethers.parseUnits(n, 18);
-    }
     const TOTAL_SUPPLY = tokens("1000000");
 
     describe("Deployment", () => {

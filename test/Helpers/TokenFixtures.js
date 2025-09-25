@@ -1,4 +1,5 @@
 const { ethers } = require("hardhat");
+const { TASK_COMPILE_TRANSFORM_IMPORT_NAME } = require("hardhat/builtin-tasks/task-names");
 
 const deployTokenFixture = async () => {
     const Token = await ethers.getContractFactory("Token");
@@ -20,7 +21,12 @@ async function transferFromTokenFixture() {
     return { token, deployer, receiver, exchange, transaction };
 }
 
+function tokens(n) {
+    return ethers.parseUnits(n, 18)
+}
+
 module.exports = {
     deployTokenFixture,
-    transferFromTokenFixture
+    transferFromTokenFixture,
+    tokens
 }
