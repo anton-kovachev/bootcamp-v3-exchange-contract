@@ -99,8 +99,6 @@ describe("Token", () => {
         })
 
         describe("Failure", () => {
-
-
             it("reject invalid spender", async () => {
                 const { token, deployer, exchange } = await loadFixture(deployTokenFixture);
 
