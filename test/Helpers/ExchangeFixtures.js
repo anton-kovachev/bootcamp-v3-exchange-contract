@@ -33,7 +33,20 @@ async function depositExchangeFixture() {
     return { tokens, exchange, accounts, transaction };
 }
 
+async function orderExchangeFixture() {
+    const { tokens, exchange, accounts } = await depositExchangeFixture();
+    const { token0, token1 } = tokens;
+    const { user1 } = accounts;
+    const AMOUNT = ethers.parseUnits("1", 18);
+
+    const transaction = await exchange.connect(user1).makeOrder(await token1.getAddress(), AMOUNT, await token0.getAddress(), AMOUNT);
+    await transaction.wait();
+
+    return { tokens, exchange, accounts, transaction };
+}
+
 module.exports = {
     deployExchangeFixture,
-    depositExchangeFixture
+    depositExchangeFixture,
+    orderExchangeFixture
 }

@@ -11,6 +11,9 @@ contract Exchange {
     mapping(address => mapping(address => uint256))
         private userTotalTokenBalance;
 
+    mapping(address => mapping(address => uint256))
+        private userActiveTotalBalance;
+
     event TokensDeposited(
         address indexed token,
         address indexed user,
@@ -24,6 +27,29 @@ contract Exchange {
         uint256 balance
     );
 
+    struct Order {
+        uint256 id;
+        address user;
+        address tokenGet;
+        uint256 amountGet;
+        address tokenGive;
+        uint256 amountGive;
+        uint256 timestamp;
+    }
+
+    event OrderCreated(
+        address indexed user,
+        address indexed tokenGet,
+        uint256 amountGet,
+        address indexed tokenGive,
+        uint256 amountGive,
+        uint256 timestamp
+    );
+
+    uint256 public orderCount;
+    mapping(uint256 => Order) public orderBook;
+    mapping(address => uint256[]) userOrders;
+
     constructor(address _owner, address _feeAccount, uint256 _feePercent) {
         owner = _owner;
         feeAccount = _feeAccount;
@@ -35,6 +61,13 @@ contract Exchange {
         address _user
     ) public view returns (uint256 amount) {
         return userTotalTokenBalance[_user][_token];
+    }
+
+    function activeBalanceOf(
+        address _token,
+        address _user
+    ) public view returns (uint256 activeAmount) {
+        return userActiveTotalBalance[_user][_token];
     }
 
     function depositToken(address _token, uint256 _amount) public {
@@ -56,7 +89,9 @@ contract Exchange {
 
     function withdrawToken(address _token, uint _amount) public {
         require(
-            userTotalTokenBalance[msg.sender][_token] >= _amount,
+            totalBalanceOf(_token, msg.sender) -
+                activeBalanceOf(_token, msg.sender) >=
+                _amount,
             "Exchange: Insufficient token balance."
         );
 
@@ -73,5 +108,42 @@ contract Exchange {
             token.transfer(msg.sender, _amount),
             "Exchange: Token transfer failed."
         );
+    }
+
+    //Make & Cancel Orders
+    function makeOrder(
+        address _tokenGet,
+        uint256 _amountGet,
+        address _tokenGive,
+        uint256 _amountGive
+    ) public {
+        require(
+            totalBalanceOf(_tokenGive, msg.sender) >=
+                activeBalanceOf(_tokenGive, msg.sender) + _amountGive,
+            "Exchange: Insufficient token balance."
+        );
+
+        orderCount += 1;
+        orderBook[orderCount] = Order(
+            orderCount,
+            msg.sender,
+            _tokenGet,
+            _amountGet,
+            _tokenGive,
+            _amountGive,
+            block.timestamp
+        );
+
+        userActiveTotalBalance[msg.sender][_tokenGive] += _amountGive;
+
+        emit OrderCreated(
+            msg.sender,
+            _tokenGet,
+            _amountGet,
+            _tokenGive,
+            _amountGive,
+            block.timestamp
+        );
+        // userOrders[msg.sender].push(orderCount);
     }
 }

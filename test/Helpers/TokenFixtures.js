@@ -22,7 +22,7 @@ async function transferFromTokenFixture() {
 }
 
 function tokens(n) {
-    return ethers.parseUnits(n, 18)
+    return ethers.parseUnits(n.toString(), 18)
 }
 
 module.exports = {
