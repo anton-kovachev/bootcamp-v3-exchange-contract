@@ -39,10 +39,6 @@ contract Exchange {
 
     function depositToken(address _token, uint256 _amount) public {
         Token token = Token(_token);
-        require(
-            token.transferFrom(msg.sender, address(this), _amount),
-            "Exchange: Token transfer failed."
-        );
         userTotalTokenBalance[msg.sender][_token] += _amount;
 
         emit TokensDeposited(
@@ -51,23 +47,31 @@ contract Exchange {
             _amount,
             userTotalTokenBalance[msg.sender][_token]
         );
-        (msg.sender, _amount);
+
+        require(
+            token.transferFrom(msg.sender, address(this), _amount),
+            "Exchange: Token transfer failed."
+        );
     }
 
     function withdrawToken(address _token, uint _amount) public {
         require(
             userTotalTokenBalance[msg.sender][_token] >= _amount,
-            "Insufficient token amount."
+            "Exchange: Insufficient token balance."
         );
 
-        Token token = Token(_token);
-        token.transfer(msg.sender, _amount);
         userTotalTokenBalance[msg.sender][_token] -= _amount;
         emit TokensWithdraw(
             _token,
             msg.sender,
             _amount,
             userTotalTokenBalance[msg.sender][_token]
+        );
+
+        Token token = Token(_token);
+        require(
+            token.transfer(msg.sender, _amount),
+            "Exchange: Token transfer failed."
         );
     }
 }

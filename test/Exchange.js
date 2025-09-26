@@ -27,8 +27,6 @@ describe("Exchange", () => {
                 expect(await tokens.token0.balanceOf(await exchange.getAddress())).to.equal(AMOUNT);
                 expect(await exchange.totalBalanceOf(await tokens.token0.getAddress(), accounts.user1.address)).to.equal(AMOUNT);
 
-                // await expect(transaction).to.emit(exchange, "TokensDeposited").withArgs(await tokens.token0.getAddress(), accounts.user1.address, AMOUNT);
-
                 expect(await tokens.token1.balanceOf(accounts.user2.address)).to.equal(0);
                 expect(await tokens.token1.balanceOf(await exchange.getAddress())).to.equal(AMOUNT);
                 expect(await exchange.totalBalanceOf(await tokens.token1.getAddress(), accounts.user2.address)).to.equal(AMOUNT);
@@ -49,7 +47,42 @@ describe("Exchange", () => {
 
                 const transaction = exchange.connect(user1).depositToken(await token0.getAddress(), AMOUNT);
                 await expect(transaction).to.be.reverted;
-                //await expect(exchange.connect(user1).depositToken(await token0.getAddress(), AMOUNT)).to.be.reverted;
+            })
+        })
+    })
+
+    describe("Withdraw tokens", () => {
+        describe("Success", () => {
+            it("tracks the token withdraw", async () => {
+                const { tokens: { token0 }, exchange, accounts: { user1 } } = await loadFixture(depositExchangeFixture);
+                const AMOUNT = ethers.parseUnits("100", 18);
+
+                const transaction = await exchange.connect(user1).withdrawToken(await token0.getAddress(), AMOUNT);
+                await transaction.wait();
+
+                expect(await token0.balanceOf(user1.address)).to.equal(AMOUNT);
+                expect(await exchange.totalBalanceOf(await token0.getAddress(), user1.address)).to.equal(0);
+
+            })
+
+            it("emits a token withdraw event", async () => {
+                const { tokens: { token0 }, exchange, accounts: { user1 } } = await loadFixture(depositExchangeFixture);
+                const AMOUNT = ethers.parseUnits("100", 18);
+
+                const transaction = await exchange.connect(user1).withdrawToken(await token0.getAddress(), AMOUNT);
+                await transaction.wait();
+
+                await expect(transaction).to.emit(exchange, "TokensWithdraw").withArgs(await token0.getAddress(), user1.address, AMOUNT, 0);
+            })
+        })
+
+        describe("Failure", () => {
+            it("fails when amount exceeds deposit", async () => {
+                const { tokens: { token0 }, exchange, accounts: { user1 } } = await loadFixture(depositExchangeFixture);
+                const AMOUNT = ethers.parseUnits("101", 18);
+
+                const transaction = exchange.connect(user1).withdrawToken(await token0.getAddress(), AMOUNT);
+                await expect(transaction).to.be.revertedWith("Exchange: Insufficient token balance.")
             })
         })
     })
