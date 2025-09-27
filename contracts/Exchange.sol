@@ -36,6 +36,17 @@ contract Exchange {
         uint256 timestamp
     );
 
+    event OrderFilled(
+        uint256 id,
+        address user,
+        address tokenGet,
+        uint256 amountGet,
+        address tokenGive,
+        uint256 amountGive,
+        address creator,
+        uint256 timestamp
+    );
+
     address public owner;
     address public feeAccount;
     uint256 public feePercent;
@@ -60,6 +71,7 @@ contract Exchange {
     mapping(uint256 => Order) public orderBook;
     mapping(address => uint256[]) userOrders;
     mapping(uint256 => bool) public isOrderCancelled;
+    mapping(uint256 => bool) public isOrderFilled;
 
     constructor(address _owner, address _feeAccount, uint256 _feePercent) {
         owner = _owner;
@@ -68,8 +80,8 @@ contract Exchange {
     }
 
     function totalBalanceOf(
-        address _token,
-        address _user
+        address _user,
+        address _token
     ) public view returns (uint256 amount) {
         return userTotalTokenBalance[_user][_token];
     }
@@ -100,7 +112,7 @@ contract Exchange {
 
     function withdrawToken(address _token, uint _amount) public {
         require(
-            totalBalanceOf(_token, msg.sender) -
+            totalBalanceOf(msg.sender, _token) -
                 activeBalanceOf(_token, msg.sender) >=
                 _amount,
             "Exchange: Insufficient token balance."
@@ -129,7 +141,7 @@ contract Exchange {
         uint256 _amountGive
     ) public {
         require(
-            totalBalanceOf(_tokenGive, msg.sender) >=
+            totalBalanceOf(msg.sender, _tokenGive) >=
                 activeBalanceOf(_tokenGive, msg.sender) + _amountGive,
             "Exchange: Insufficient token balance."
         );
@@ -179,6 +191,72 @@ contract Exchange {
             order.amountGet,
             order.tokenGive,
             order.amountGive,
+            block.timestamp
+        );
+    }
+
+    function fillOrder(uint256 _id) public {
+        Order storage order = orderBook[_id];
+        require(order.id == _id, "Exchange: Order does not exists.");
+        require(
+            isOrderCancelled[_id] == false,
+            "Exchange: Order is cancelled."
+        );
+        require(
+            order.user != msg.sender,
+            "Exchange: Order creator is not allowed to fill it."
+        );
+        require(
+            isOrderFilled[_id] == false,
+            "Exchange: Order is already filled."
+        );
+
+        _trade(
+            _id,
+            order.user,
+            order.tokenGet,
+            order.amountGet,
+            order.tokenGive,
+            order.amountGive
+        );
+
+        isOrderFilled[_id] = true;
+    }
+
+    function _trade(
+        uint256 _orderId,
+        address _user,
+        address _tokenGet,
+        uint256 _amountGet,
+        address _tokenGive,
+        uint256 _amountGive
+    ) internal {
+        //Swap Balance
+        require(
+            userTotalTokenBalance[msg.sender][_tokenGet] -
+                userActiveTotalBalance[msg.sender][_tokenGet] >=
+                _amountGet,
+            "Exchange: Insufficient tokenGet balance."
+        );
+
+        uint256 _feeAmount = (_amountGet * feePercent) / 100;
+        userTotalTokenBalance[msg.sender][_tokenGet] -= _amountGet + _feeAmount;
+        userTotalTokenBalance[msg.sender][_tokenGive] += _amountGive;
+
+        userActiveTotalBalance[_user][_tokenGive] -= _amountGive;
+        userTotalTokenBalance[_user][_tokenGive] -= _amountGive;
+        userTotalTokenBalance[_user][_tokenGet] += _amountGet;
+
+        userTotalTokenBalance[feeAccount][_tokenGet] += _feeAmount;
+
+        emit OrderFilled(
+            _orderId,
+            msg.sender,
+            _tokenGet,
+            _amountGet,
+            _tokenGive,
+            _amountGive,
+            _user,
             block.timestamp
         );
     }

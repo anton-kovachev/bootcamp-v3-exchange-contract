@@ -45,8 +45,13 @@ async function orderExchangeFixture() {
     return { tokens, exchange, accounts, transaction };
 }
 
+function calculateFees(amount, feePercent) {
+    return (amount * feePercent) / BigInt(100);
+}
+
 module.exports = {
     deployExchangeFixture,
     depositExchangeFixture,
-    orderExchangeFixture
+    orderExchangeFixture,
+    calculateFees
 }
