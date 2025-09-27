@@ -4,6 +4,38 @@ pragma solidity ^0.8.28;
 import {Token} from "./Token.sol";
 
 contract Exchange {
+    event TokensDeposited(
+        address indexed token,
+        address indexed user,
+        uint256 amount,
+        uint256 balance
+    );
+
+    event TokensWithdraw(
+        address indexed token,
+        address indexed user,
+        uint256 amount,
+        uint256 balance
+    );
+
+    event OrderCreated(
+        address indexed user,
+        address indexed tokenGet,
+        uint256 amountGet,
+        address indexed tokenGive,
+        uint256 amountGive,
+        uint256 timestamp
+    );
+
+    event OrderCancelled(
+        address indexed user,
+        address indexed tokenGet,
+        uint256 amountGet,
+        address indexed tokenGive,
+        uint256 amountGive,
+        uint256 timestamp
+    );
+
     address public owner;
     address public feeAccount;
     uint256 public feePercent;
@@ -13,19 +45,6 @@ contract Exchange {
 
     mapping(address => mapping(address => uint256))
         private userActiveTotalBalance;
-
-    event TokensDeposited(
-        address indexed token,
-        address indexed user,
-        uint256 amount,
-        uint256 balance
-    );
-    event TokensWithdraw(
-        address indexed token,
-        address indexed user,
-        uint256 amount,
-        uint256 balance
-    );
 
     struct Order {
         uint256 id;
@@ -37,18 +56,10 @@ contract Exchange {
         uint256 timestamp;
     }
 
-    event OrderCreated(
-        address indexed user,
-        address indexed tokenGet,
-        uint256 amountGet,
-        address indexed tokenGive,
-        uint256 amountGive,
-        uint256 timestamp
-    );
-
     uint256 public orderCount;
     mapping(uint256 => Order) public orderBook;
     mapping(address => uint256[]) userOrders;
+    mapping(uint256 => bool) public isOrderCancelled;
 
     constructor(address _owner, address _feeAccount, uint256 _feePercent) {
         owner = _owner;
@@ -145,5 +156,30 @@ contract Exchange {
             block.timestamp
         );
         // userOrders[msg.sender].push(orderCount);
+    }
+
+    function cancelOrder(uint256 _id) public {
+        Order storage order = orderBook[_id];
+        require(order.id == _id, "Exchange: Order does not exists.");
+        require(
+            order.user == msg.sender,
+            "Exchange: Not the owner of the order."
+        );
+        require(
+            isOrderCancelled[_id] == false,
+            "Exchange: Order already cancelled."
+        );
+
+        isOrderCancelled[_id] = true;
+        userActiveTotalBalance[msg.sender][order.tokenGive] -= order.amountGive;
+
+        emit OrderCancelled(
+            msg.sender,
+            order.tokenGet,
+            order.amountGet,
+            order.tokenGive,
+            order.amountGive,
+            block.timestamp
+        );
     }
 }

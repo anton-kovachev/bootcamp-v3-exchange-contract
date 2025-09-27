@@ -115,4 +115,71 @@ describe("Exchange", () => {
             })
         })
     })
+
+    describe("Cancel Order", () => {
+        describe("Success", () => {
+            it("track cancelled order", async () => {
+                const { tokens: { token0, token1 }, exchange, accounts: { user1 } } = await loadFixture(orderExchangeFixture);
+
+                const transaction = await exchange.connect(user1).cancelOrder(1);
+                await transaction.wait();
+
+                expect(await exchange.isOrderCancelled(1)).to.equal(true);
+            })
+
+            it("active balance of", async () => {
+                const { tokens: { token0, token1 }, exchange, accounts: { user1 } } = await loadFixture(orderExchangeFixture);
+
+                const transaction = await exchange.connect(user1).cancelOrder(1);
+                await transaction.wait();
+
+                expect(await exchange.activeBalanceOf(await token0.getAddress(), user1.address)).to.equal(0);
+            })
+
+            it("emits an order cancelled event", async () => {
+                const { tokens: { token0, token1 }, exchange, accounts: { user1 } } = await loadFixture(orderExchangeFixture);
+                const ORDER_ID = 1;
+                const AMOUNT = tokens(1);
+
+                const transaction = await exchange.connect(user1).cancelOrder(ORDER_ID);
+                await transaction.wait();
+                const { timestamp } = await ethers.provider.getBlock();
+
+                await expect(transaction).to.emit(exchange, "OrderCancelled").withArgs(user1.address, await token1.getAddress(), AMOUNT, await token0.getAddress(), AMOUNT, timestamp);
+            })
+        })
+
+        describe("Fail", () => {
+            it("cancelling a cancelled order", async () => {
+                const { exchange, accounts: { user1 } } = await loadFixture(orderExchangeFixture);
+                const ORDER_ID = 1;
+                const ERROR = "Exchange: Order already cancelled."
+
+                await (await exchange.connect(user1).cancelOrder(ORDER_ID)).wait();
+                const transaction = exchange.connect(user1).cancelOrder(1);
+
+                await expect(transaction).to.be.revertedWith(ERROR);
+            })
+
+            it("cancelling a none existing order", async () => {
+                const { exchange, accounts: { user1 } } = await loadFixture(orderExchangeFixture);
+                const ORDER_ID = 20;
+                const ERROR = "Exchange: Order does not exists."
+
+                const transaction = exchange.connect(user1).cancelOrder(ORDER_ID);
+
+                await expect(transaction).to.be.revertedWith(ERROR);
+            })
+
+            it("cancelling another user's order order", async () => {
+                const { exchange, accounts: { user2 } } = await loadFixture(orderExchangeFixture);
+                const ORDER_ID = 1;
+                const ERROR = "Exchange: Not the owner of the order."
+
+                const transaction = exchange.connect(user2).cancelOrder(ORDER_ID);
+
+                await expect(transaction).to.be.revertedWith(ERROR);
+            })
+        })
+    })
 })
