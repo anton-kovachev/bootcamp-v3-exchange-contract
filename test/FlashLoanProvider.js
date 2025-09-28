@@ -17,17 +17,54 @@ async function flashLoanFixture() {
 }
 
 describe("FlashLoanProvider", () => {
-    describe("Calling flashLoan from FlashLoand user", () => {
-        it("emits a FlashLoan event", async () => {
-            const { tokens: { token0 }, exchange, accounts: { user1 }, flashLoanUser } = await loadFixture(flashLoanFixture);
-            const AMOUNT = tokens(100);
+    describe("Calling flashLoan from FlashLoan user", () => {
 
-            console.log("balance before", await token0.balanceOf(await flashLoanUser.getAddress()));
-            const transaction = await flashLoanUser.connect(user1).getFlashLoan(await token0.getAddress(), AMOUNT);
-            await transaction.wait();
-            const { timestamp } = await ethers.provider.getBlock();
-            await expect(transaction).to.emit(exchange, "FlashLoan").withArgs(await token0.getAddress(), AMOUNT, timestamp);
-            console.log("balance after", await token0.balanceOf(await flashLoanUser.getAddress()));
+        describe("Success", () => {
+            it("emits a Flash Loan event", async () => {
+                const { tokens: { token0 }, exchange, accounts: { user1 }, flashLoanUser } = await loadFixture(flashLoanFixture);
+                const AMOUNT = tokens(100);
+
+                const transaction = await flashLoanUser.connect(user1).getFlashLoan(await token0.getAddress(), AMOUNT);
+                await transaction.wait();
+                const { timestamp } = await ethers.provider.getBlock();
+                await expect(transaction).to.emit(exchange, "FlashLoan").withArgs(await token0.getAddress(), AMOUNT, timestamp);
+            })
+
+            it("emits a Flash Loan event", async () => {
+                const { tokens: { token0 }, exchange, accounts: { user1 }, flashLoanUser } = await loadFixture(flashLoanFixture);
+                const AMOUNT = tokens(100);
+
+                const transaction = await flashLoanUser.connect(user1).getFlashLoan(await token0.getAddress(), AMOUNT);
+                await transaction.wait();
+                const { timestamp } = await ethers.provider.getBlock();
+                await expect(transaction).to.emit(flashLoanUser, "FlashLoanReceived").withArgs(await flashLoanUser.getAddress(), await token0.getAddress(), AMOUNT);
+            })
+        })
+
+        describe("Failure", () => {
+            it("fails due to insufficient amount", async () => {
+                const { tokens: { token0 }, accounts: { user1 }, flashLoanUser } = await loadFixture(flashLoanFixture);
+                const AMOUNT = tokens(1000);
+
+                const transaction = flashLoanUser.connect(user1).getFlashLoan(await token0.getAddress(), AMOUNT);
+                await expect(transaction).to.be.revertedWith("FlashLoanProvider: Insufficient funds to loan.")
+            })
+
+            it("fails due to not the owner", async () => {
+                const { tokens: { token0 }, accounts: { user2 }, flashLoanUser } = await loadFixture(flashLoanFixture);
+                const AMOUNT = tokens(100);
+
+                const transaction = flashLoanUser.connect(user2).getFlashLoan(await token0.getAddress(), AMOUNT);
+                await expect(transaction).to.be.revertedWith("FlashLoanUser: Only owner can request flash loans")
+            })
+
+            it("fails due to be called from a malicious user", async () => {
+                const { tokens: { token0 }, accounts: { user2 }, flashLoanUser } = await loadFixture(flashLoanFixture);
+                const AMOUNT = tokens(100);
+
+                const transaction = flashLoanUser.connect(user2).receiveFlashLoan(await token0.getAddress(), AMOUNT, "0x");
+                await expect(transaction).to.be.revertedWith("FlashLoanUser: Not Exchange contract")
+            })
         })
     })
 })
