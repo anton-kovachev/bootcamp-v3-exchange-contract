@@ -1,17 +1,28 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #050505;
+  --foreground: #FFFFFF;
+
+  --clr-black: #050505;
+  --clr-white: #FFFFFF;
+  --clr-gray: #686868;
+  --clr-orange: #FF9C1C;
+  --clr-green: #2FD070;
+  --clr-red: #D02F2F;
+
+  /*
+    The general theme with buttons, links, and sections
+    include a border radius of 38px. 
+  */
+  --global-radius: 38px;
+  --global-transition: 300ms ease all;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ------------------------------------------------------ */
+/* LAYOUT */
 
 html,
 body {
+  color-scheme: dark;
   max-width: 100vw;
   overflow-x: hidden;
 }
@@ -19,9 +30,15 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+
+  font-family: "Lexend", Arial;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+
+  position: relative;
 }
 
 * {
@@ -30,13 +47,1277 @@ body {
   margin: 0;
 }
 
-a {
-  color: inherit;
+.content {
+  grid-column: 2 / 13;
+  padding: 1em;
+  gap: 1em;
+}
+
+/* ------------------------------------------------------ */
+/* GLOBAL STYLES */
+
+/* COLORS */
+
+.gray {
+  color: var(--clr-gray);
+}
+
+.green {
+  color: var(--clr-green);
+}
+
+.red {
+  color: var(--clr-red);
+}
+
+.orange {
+  color: var(--clr-orange);
+}
+
+/* 
+  The following is used when dynamnically
+  hovering over an element. Ex. Canceling
+  an open order.
+*/
+
+.hover-red:hover {
+  cursor: pointer;
+  outline: 1px solid var(--clr-red);
+}
+
+/* TEXT */
+
+small {
+  color: var(--clr-gray);
+  font-size: 0.80rem;
+}
+
+/* FLEX LAYOUT */
+
+.flex {
+  display: flex;
+  align-items: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.center {
+  grid-column: span 13;
+  padding: 3em;
+
+  font-size: 1.20rem;
+  text-align: center;
+}
+
+/* SCROLL BAR */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: var(--global-radius);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--clr-gray);
+  border-radius: var(--global-radius);
+  transition: var(--global-transition);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--clr-orange);
+}
+
+::-webkit-scrollbar-corner {
+  display: none;
+}
+
+/* BUTTON */
+
+.button {
+  width: 100px;
+  height: 40px;
+
+  background: var(--background);
+  color: var(--clr-orange);
+
+  border: 1px solid var(--clr-gray);
+  border-radius: var(--global-radius);
+
+  font-family: "Lexend";
+  font-size: 0.90rem;
+  font-weight: 300;
+
+  cursor: pointer;
+  transition: var(--global-transition);
+}
+
+.button:hover {
+  background-color: var(--clr-orange);
+  color: var(--clr-black);
+
+  border: 1px solid var(--clr-foreground);
+}
+
+/* LINK */
+
+.link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+
+  text-decoration: none;
+  color: var(--clr-gray);
+
+  transition: var(--global-transition);
+}
+
+.link:hover {
+  color: var(--clr-white);
+}
+
+/* TABS */
+
+.tabs {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+
+  padding: 0.25em;
+
+  border: 1px solid var(--clr-gray);
+  border-radius: var(--global-radius);
+}
+
+.tab {
+  background-color: transparent;
+  color: var(--clr-gray);
+
+  padding: 0.75em;
+
+  border: none;
+  border-radius: var(--global-radius);
+
+  font-family: "Lexend";
+  font-weight: 300;
+
+  cursor: pointer;
+
+  transition: var(--global-transition);
+}
+
+.tab--active {
+  background-color: var(--clr-orange);
+  color: var(--clr-black);
+}
+
+/* TABLE */
+
+table {
+  table-layout: fixed;
+  border-collapse: collapse;
+
+  width: 100%;
+}
+
+table caption {
+  padding: 0 0 1em 1em;
+
+  font-size: 0.90rem;
+  font-weight: 300;
+  text-align: left;
+}
+
+table th {
+  color: var(--clr-gray);
+
+  font-size: 0.90rem;
+  font-weight: 300;
+  text-align: left;
+}
+
+table td,
+table th {
+  padding: 1em;
+}
+
+table tbody tr {
+  border-radius: var(--global-radius);
+  overflow: hidden;
+}
+
+table tbody tr:first-child {
+  padding-top: 1em;
+}
+
+table tbody tr:nth-of-type(odd) {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+table tbody tr:nth-of-type(odd) td:first-child {
+  border-top-left-radius: var(--global-radius);
+  border-bottom-left-radius: var(--global-radius);
+}
+
+table tbody tr:nth-of-type(odd) td:last-child {
+  border-top-right-radius: var(--global-radius);
+  border-bottom-right-radius: var(--global-radius);
+}
+
+/* 
+  For some tables we want them to
+  be scrollable. We wrap the tables in 
+  a div and customize the scrollbar
+*/
+
+.table-wrapper {
+  max-height: 20em;
+  padding: 0 0.50em 0 0.10em;
+  overflow-y: auto;
+}
+
+.table-wrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* 
+  The only table with different layout is
+  the tables on the wallet/page. Here we
+  want the 3rd <td> to be on the right
+*/
+
+.balance {
+  table-layout: auto;
+}
+
+.balance tr td:nth-of-type(3),
+.balance tr th:nth-of-type(3) {
+  text-align: right;
+}
+
+/* FORM */
+
+form {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1em;
+}
+
+select {
+  /* background: url("./assets/carets/down.svg"); */
+  background-repeat: no-repeat;
+  background-position: 90%;
+  width: 100%;
+
+  border: none;
+  border-radius: var(--global-radius);
+
+  padding: 1em;
+
+  font-family: "Lexend";
+
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+
+  cursor: pointer;
+  position: relative;
+}
+
+select option {
+  background-color: var(--clr-black);
+}
+
+form label {
+  font-size: 0.85em;
+  font-weight: 300;
+}
+
+form input {
+  background-color: transparent;
+  width: 100%;
+
+  border: 1px solid var(--clr-gray);
+  border-radius: var(--global-radius);
+
+  font-family: "Lexend";
+  letter-spacing: 1px;
+
+  padding: 1em;
+}
+
+form input[type="submit"] {
+  font-family: "Lexend";
+  font-weight: 300;
+  text-transform: capitalize;
+
+  border: 1px solid var(--clr-orange);
+  color: var(--clr-orange);
+
+  cursor: pointer;
+
+  transition: var(--global-transition);
+}
+
+form input[type="submit"]:hover {
+  background-color: var(--clr-orange);
+  color: var(--clr-black);
+}
+
+/* CUSTOM SELECT */
+
+.select {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background-color: rgba(255, 255, 255, 0.02);
+
+  border-radius: var(--global-radius);
+
+  cursor: pointer;
+
+  position: relative;
+}
+
+.options {
+  position: absolute;
+  bottom: -2em;
+  left: 1em;
+}
+
+.option {
+  background-color: gray;
+  border-bottom: 1px solid white;
+
+  padding: 0.5em;
+}
+
+
+/* PAGINATION */
+
+.pagination {
+  grid-column: 1 / 13;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2em;
+}
+
+.pagination button {
+  background-color: var(--background);
+
+  padding: 1em;
+
+  border: 1px solid var(--clr-gray);
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  transition: var(--global-transition);
+}
+
+.pagination button:hover {
+  background-color: var(--clr-orange);
+}
+
+.pagination ol {
+  /* This will display flex on larger screens */
+  display: none;
+
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+
+  list-style: none;
+
+  color: var(--clr-gray);
+}
+
+.pagination ol li a {
+  color: var(--clr-gray);
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+.pagination ol li .active {
+  color: var(--clr-orange);
+}
+
+/* ------------------------------------------------------ */
+/* TOP NAVIGATION */
+
+.topnav {
+  height: 68px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 1em;
+  border: 1px solid var(--clr-gray);
+  border-radius: var(--global-radius);
+}
+
+.topnav .network {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.topnav .network .icon {
+  /* This will display flex on larger screens */
+  display: none;
+
+  justify-content: center;
+  align-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  border: 1px solid var(--clr-gray);
+  border-radius: 50%;
+
+  cursor: pointer;
+}
+
+.topnav select {
+  background-color: var(--background);
+  border: none;
+
+  width: 100px;
+  padding: 1em;
+
+  font-family: "Lexend";
+
+  cursor: pointer;
+}
+
+.topnav select option {
+  background-color: var(--background);
+
+  cursor: pointer;
+}
+
+.topnav .account {
+  display: flex;
+  align-items: center;
+}
+
+.topnav .account .balance {
+  display: none;
+
+  padding: 0 4em;
+}
+
+.topnav .account .balance p {
+  font-size: 0.90rem;
+  color: var(--clr-gray);
+  padding: 0 0.25em;
+}
+
+.topnav .account .balance p span {
+  color: var(--clr-orange);
+}
+
+/* ------------------------------------------------------ */
+/* SIDE NAVIGATION */
+
+.sidenav {
+  grid-column: 1 / 2;
+
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 3em;
+
+  padding: 1.75em 0 0 1em;
+  border-radius: 12px;
+
+  position: relative;
+  transition: var(--global-transition);
+}
+
+.sidenav .logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1em;
+
+  padding: 1em;
+
+  width: 44px;
+  height: 44px;
+
+  border: 1px solid var(--clr-gray);
+  border-radius: 50%;
+
+  transition: var(--global-transition);
+}
+
+.sidenav .logo img {
+  width: 16px;
+  height: 16px;
+
+  transition: var(--global-transition);
+}
+
+.sidenav .logo p {
+  display: none;
+}
+
+.sidenav .toggle {
+  background-color: var(--background);
+
+  position: absolute;
+  right: 0.5em;
+  top: 2.6em;
+
+  width: 28px;
+  height: 28px;
+
+  border: 1px solid var(--clr-gray);
+  border-radius: 50%;
+
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidenav .links {
+  list-style: none;
+}
+
+.sidenav .links li {
+  padding: 0.5em 0;
+}
+
+.sidenav .links li .link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  font-size: 0.90rem;
+  text-decoration: none;
+  color: #ffffff;
+
+  border: 1px solid var(--clr-gray);
+  border-radius: 50%;
+
+  opacity: 0.6;
+  transition: var(--global-transition);
+}
+
+.sidenav .links li .link:hover {
+  opacity: 1;
+}
+
+.sidenav .links li .link--active {
+  opacity: 1;
+  background: linear-gradient(90deg, var(--clr-orange), 20%, var(--clr-black));
+}
+
+.sidenav .links li .link--active .label .icon {
+  border: none !important;
+  background-color: var(--clr-orange);
+}
+
+.sidenav .links li .link .label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.sidenav .links li .link .label .icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 44px;
+  height: 44px;
+
+  border: 1px solid var(--clr-gray);
+  border-radius: 50%;
+}
+
+.sidenav .links li .link .label .icon img {
+  width: 20px;
+  height: 20px;
+}
+
+.sidenav .links li .link .label span,
+.sidenav .links li .link .arrow {
+  display: none;
+}
+
+/* ------------------------------------------------------ */
+/* PAGE */
+
+.page {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: auto;
+
+  padding-top: 3em;
+  gap: 1em;
+}
+
+.page .title {
+  grid-row: 1;
+  grid-column: span 12;
+
+  font-weight: 400;
+}
+
+.page section {
+  grid-column: span 12;
+
+  background-color: rgba(255, 255, 255, 0.04);
+  border-radius: var(--global-radius);
+
+  padding: 1.50em;
+
+  position: relative;
+  overflow: hidden;
+}
+
+.page section h2 {
+  font-size: clamp(1rem, 3svw, 1.30rem);
+  font-weight: 400;
+  padding-bottom: 1em;
+}
+
+.page .placeholder {
+  grid-column: span 13;
+  min-height: 50svh;
+
+  background: linear-gradient(360deg, var(--clr-orange), 0.1%, rgba(255, 255, 255, 0.04));
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  text-align: center;
+
+  position: relative;
+  overflow: hidden;
+}
+
+.page .placeholder img {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotateY(180deg);
+  z-index: -1;
+  opacity: 0.5;
+
+  animation: spin 1s forwards ease;
+}
+
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotateY(180deg);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) rotateY(0deg);
+  }
+}
+
+.page .placeholder .button {
+  width: 200px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: var(--clr-black);
+  color: var(--clr-orange);
+
+  border: 1px solid var(--clr-orange);
+
+  font-weight: 300;
+  text-decoration: none;
+}
+
+.page .placeholder .button:hover {
+  background: var(--clr-orange);
+  color: var(--clr-white);
+}
+
+/* ------------------------------------------------------ */
+
+/* 
+  The following styles are specific to each individual page 
+*/
+
+/* DEPOSIT & WITHDRAW FORM */
+
+.deposit .token,
+.withdraw .token {
+  grid-column: 1 / 7;
+}
+
+.deposit .amount,
+.withdraw .amount {
+  grid-column: 7 / 13;
+}
+
+.deposit .token,
+.deposit .amount,
+.withdraw .token,
+.withdraw .amount {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.deposit .token .select,
+.withdraw .token .select {
+  width: 100%;
+}
+
+.info {
+  grid-column: 1 / 13;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+}
+
+.info div {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.50em;
+
+  background-color: rgba(255, 255, 255, 0.02);
+
+  width: 100%;
+  padding: 1.50em;
+
+  border-radius: var(--global-radius);
+}
+
+.info div p {
+  font-weight: 300;
+}
+
+.info div p:first-child {
+  font-size: 0.85rem;
+  color: var(--clr-gray);
+}
+
+.deposit form input[type="submit"],
+.withdraw form input[type="submit"] {
+  grid-column: 1 / 13;
+}
+
+/* BUY/SELL ORDER FORM */
+
+.order {
+  background: linear-gradient(360deg, var(--clr-orange), 0.1%, rgba(255, 255, 255, 0.04));
+}
+
+.order form {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1em;
+}
+
+.order form .select {
+  grid-column: 1 / 13;
+}
+
+.order form label,
+.order form input {
+  grid-column: 1 / 13;
+}
+
+/* ORDERBOOK */
+/* 
+  Since the order book rows are meant to be
+  clickable, we make it behave like a button
+*/
+
+.orderbook .table-wrapper:last-child {
+  padding-top: 1em;
+}
+
+.orderbook table {
+  min-width: 400px;
+}
+
+.orderbook table tbody tr {
+  cursor: pointer;
+}
+
+.orderbook table tbody tr:hover {
+  outline: 1px solid var(--clr-orange);
+}
+
+/* MARKET */
+
+.trading .market {
+  grid-row: 2;
+  grid-column: span 12;
+}
+
+/* PRICE CHART & STATS */
+
+/* 
+  .insights is used for the price chart and
+  other price related data. This section is
+  used 2 times in routes / and /swap
+*/
+
+.insights .stats {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+.insights .price {
+  font-size: 1.20rem;
+  display: flex;
+  align-items: center;
+}
+
+.insights .difference {
+  font-size: 0.85rem;
+  color: var(--clr-gray);
+}
+
+.insights select {
+  width: 140px;
+
+  background-color: rgba(255, 255, 255, 0.02);
+  border: none;
+  border-radius: var(--global-radius);
+
+  font-family: "Lexend";
+  padding: 1em;
+
+  cursor: pointer;
+}
+
+/* 
+  Specific to /swap, we only showcase the price
+  chart on larger devices. See media query 992px.
+*/
+
+.swapping .insights {
+  display: none;
+}
+
+.orders table,
+.transactions table {
+  min-width: 400px;
+}
+
+/* 
+  The following is specific to displaying
+  the price chart.
+*/
+
+.chart {
+  height: 100%;
+}
+
+/* 
+  We'll only display this select on larger devices.
+  See media query 768px.
+*/
+
+.chart select {
+  display: none;
+}
+
+/* 
+  The following is specfic for apexcharts
+*/
+
+.apexcharts-tooltip {
+  background: var(--background);
+}
+
+/* SWAP FORM */
+
+.swapping .inputs .arrow {
+  width: 25px;
+  height: 25px;
+}
+
+.swap {
+  grid-column: 1 / 4;
+  background: linear-gradient(360deg, var(--clr-orange), 0.1%, rgba(255, 255, 255, 0.04));
+}
+
+.swap form {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.swap form .inputs {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.50em;
+}
+
+.swap form .input {
+  background-image: none;
+
+  height: 120px;
+  padding: 1em;
+
+  position: relative;
+}
+
+.swap form .input input {
+  border: none;
+
+  font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 0px;
+
+  color: var(--clr-white);
+}
+
+.swap form .input .info {
+  font-size: 0.80rem;
+  color: var(--clr-gray);
+}
+
+.swap form .input .select {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+
+  width: 120px;
+
+  transition: 300ms ease all;
+}
+
+.swap form .input .select select {
+  color: white;
+  opacity: 1;
+}
+
+.swap form .arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+
+  background-color: var(--clr-orange);
+  border-radius: 50%;
+
+  transition: 300ms ease all;
+}
+
+.swap .fees {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.swap .fees .fee {
+  display: flex;
+  justify-content: space-between;
+
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+
+.swap .cancel {
+  width: max-content;
+  margin: 0 auto;
+
+  color: var(--clr-orange);
+}
+
+.swap .cancel:hover {
+  color: var(--clr-white);
+}
+
+/* LOANS */
+
+.loans .data {
+  grid-column: 1 / 13;
+}
+
+.loans .table-wrapper {
+  overflow-x: scroll;
+}
+
+.loans table {
+  min-width: 550px;
+}
+
+/* ------------------------------------------------------ */
+/* MEDIA QUERIES */
+
+@media only screen and (min-width: 480px) {
+  .topnav .network .icon {
+    display: flex;
+  }
+
+  .sidenav {
+    gap: 2em;
+    padding: 1em;
+  }
+
+  .sidenav .logo {
+    width: 68px;
+    height: 68px;
+  }
+
+  .sidenav .logo img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .sidenav .links li .link {
+    width: 68px;
+    height: 68px;
+  }
+
+  .pagination ol {
+    display: flex;
+  }
+
+
+  /* ------------------------------------------------------ */
+  /* PAGE */
+
+  /* /swap */
+
+  .swapping .inputs .arrow {
+    width: 30px;
+    height: 30px;
+  }
+
+  .swap form .input {
+    background-image: url('./assets/backgrounds/swap-background-1.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  .swap form .input:last-child {
+    background-image: url('./assets/backgrounds/swap-background-2.svg');
+  }
+
+  .swap form .input .select {
+    top: 1em;
+    right: 1em;
+    left: initial;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .pagination {
+    gap: 5em;
+  }
+
+  .chart select {
+    display: block;
+  }
+}
+
+@media only screen and (min-width: 992px) {
+
+  /* ------------------------------------------------------ */
+  /* LAYOUT */
+
+  .content {
+    grid-column: 4 / 13;
+  }
+
+  .sidenav {
+    grid-column: 1 / 4;
+  }
+
+  /* TOP NAVIGATION */
+  .topnav .account .balance {
+    display: flex;
+    align-items: center;
+  }
+
+  /* GLOBAL STYLES */
+
+  .button {
+    width: 140px;
+  }
+
+  /* ------------------------------------------------------ */
+  /* SIDE NAVIGATION */
+
+  .sidenav .toggle {
+    display: flex;
+  }
+
+  .sidenav .logo {
+    justify-content: flex-start;
+    width: 100%;
+    border-radius: var(--global-radius);
+  }
+
+  .sidenav .logo p {
+    display: block;
+  }
+
+  .sidenav .links li .link {
+    width: 100%;
+    padding: 1em;
+    border-radius: var(--global-radius);
+  }
+
+  .sidenav .links li .link .label {
+    width: auto;
+  }
+
+  .sidenav .links li .link .label .icon {
+    margin-right: 1em;
+  }
+
+  .sidenav .links li .link .label span,
+  .sidenav .links li .link .arrow {
+    display: block;
+  }
+
+  /* ------------------------------------------------------ */
+  /* PAGE */
+
+  /* 
+    By default all page sections will 
+    span 6 columns in a 12 column grid 
+  */
+
+  .page section {
+    grid-column: span 6;
+  }
+
+  /* /trading */
+
+  .trading .market {
+    grid-row: 2;
+    grid-column: 8 / 13;
+  }
+
+  .trading .insights {
+    grid-row: span 2;
+    grid-column: 1 / 8;
+  }
+
+  .trading .order {
+    grid-row: 3;
+    grid-column: 8 / 13;
+
+    min-height: 320px;
+  }
+
+  .trading .orderbook {
+    grid-column: 1 / 13;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1em 2em;
+  }
+
+  .trading .orderbook .table-wrapper:last-child {
+    padding: 0 0.50em 0 0.10em;
+  }
+
+  .trading .orderbook h2 {
+    grid-row: 1;
+    grid-column: 1 / 3;
+  }
+
+  .trading .orderbook table {
+    columns: 2;
+  }
+
+  /* /swap */
+
+  .swapping .insights {
+    display: block;
+    grid-column: 7 / 13;
+  }
+
+  .swapping .swap {
+    grid-column: 1 / 7;
+  }
+
+  .swapping .inputs .arrow {
+    width: 35px;
+    height: 35px;
+  }
+
+  /* /loans */
+
+  .page .loans {
+    grid-column: 1 / 13;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  /* ------------------------------------------------------ */
+  /* PAGE */
+
+  /* /swap */
+
+  .swapping .insights {
+    grid-column: 6 / 13;
+  }
+
+  .swapping .swap {
+    grid-column: 1 / 6;
+  }
+}
+
+@media only screen and (min-width: 1500px) {
+  /* ------------------------------------------------------ */
+  /* PAGE */
+
+  /* /swap */
+
+  .swapping .inputs .arrow {
+    width: 40px;
+    height: 40px;
   }
 }

@@ -6,16 +6,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint"
   },
   "dependencies": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "next": "15.5.4"
-  },
-  "devDependencies": {
-    "eslint": "^9",
-    "eslint-config-next": "15.5.4",
-    "@eslint/eslintrc": "^3"
+    "@metamask/sdk-react": "0.31.4",
+    "@reduxjs/toolkit": "2.5.0",
+    "ethers": "6.13.4",
+    "lodash": "4.17.21",
+    "moment": "2.30.1",
+    "next": "15.1.3",
+    "react": "18.3.1",
+    "react-apexcharts": "1.7.0",
+    "react-dom": "18.3.1",
+    "react-jazzicon": "1.0.4",
+    "react-redux": "9.2.0",
+    "reselect": "5.1.1"
   }
 }
