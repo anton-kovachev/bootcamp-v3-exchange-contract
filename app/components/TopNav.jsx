@@ -1,19 +1,23 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ethers } from "ethers";
 import { MetaMaskProvider, useSDK, metamask } from "@metamask/sdk-react";
-import { useProvider } from "../hooks/useProvider";
+import { ethers } from "ethers";
+import Jazzicon from "react-jazzicon";
 
 import network from "@/app/assets/other/network.svg";
 import config from "@/app/config.json";
-import Jazzicon from "react-jazzicon";
+import { useProvider } from "../hooks/useProvider";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { setAccount, setBalance } from "@/lib/features/user/user";
+import { selectAccount, selectETHBalance } from "@/lib/selectors";
 
 function TopNav() {
-  const [account, setAccount] = useState("");
-  const [balance, setBalance] = useState("");
   const { sdk, provider: metamask } = useSDK();
   const { provider, chainId } = useProvider();
+  const dispatch = useAppDispatch();
+  const account = useAppSelector(selectAccount);
+  const balance = useAppSelector(selectETHBalance);
 
   const networkHandler = async (event) => {
     await metamask.request({
@@ -37,9 +41,9 @@ function TopNav() {
   const getAccountInfo = async () => {
     const account = await provider.getSigner();
     const balance = await provider.getBalance(account);
-    setAccount(account.address);
+    dispatch(setAccount(account.address));
+    dispatch(setBalance(ethers.formatEther(balance)));
     console.log(ethers.formatEther(balance));
-    setBalance(ethers.formatEther(balance));
   };
 
   useEffect(() => {
@@ -53,9 +57,8 @@ function TopNav() {
           await getAccountInfo();
         }
       });
+      metamask.on("chainChanged", () => window.location.reload());
     }
-
-    metamask.on("chainChanged", () => window.location.reload());
 
     return () => {
       metamask?.removeAllListeners();
