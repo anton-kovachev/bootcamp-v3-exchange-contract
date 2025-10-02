@@ -28,7 +28,6 @@ function TopNav() {
 
   const connectHandler = async () => {
     try {
-      debugger;
       if (provider) {
         await sdk.connectAndSign({ msg: "Sign in to DAPP Exchange." });
         await getAccountInfo();
@@ -43,7 +42,6 @@ function TopNav() {
     const balance = await provider.getBalance(account);
     dispatch(setAccount(account.address));
     dispatch(setBalance(ethers.formatEther(balance)));
-    console.log(ethers.formatEther(balance));
   };
 
   useEffect(() => {
