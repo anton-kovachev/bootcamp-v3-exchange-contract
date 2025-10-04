@@ -38,10 +38,8 @@ function TopNav() {
   };
 
   const getAccountInfo = async () => {
-    debugger;
     const account = await provider.getSigner();
     const balance = await provider.getBalance(account);
-    const network = await provider.getNetwork();
     dispatch(setAccount(account.address));
     dispatch(setBalance(ethers.formatEther(balance)));
   };
@@ -49,7 +47,6 @@ function TopNav() {
   useEffect(() => {
     if (sdk && metamask) {
       metamask.on("accountsChanged", async (accounts) => {
-        debugger;
         if (!accounts?.length) {
           setAccount(null);
           setBalance(0);

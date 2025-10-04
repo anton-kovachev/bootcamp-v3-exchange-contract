@@ -2,7 +2,7 @@ import Image from "next/image";
 import dapp from "@/app/assets/tokens/dapp.svg";
 // import eth from "@app/assets/tokens/eth.svg";
 
-export function Balances({ balances }) {
+export default function Balances({ balances }) {
   return (
     <table>
       <thead>
