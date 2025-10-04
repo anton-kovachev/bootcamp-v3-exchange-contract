@@ -12,7 +12,7 @@ import Chart from "./components/Chart"
 
 import { useAppSelector } from "@/lib/hooks";
 import { useAppDispatch } from "@/lib/hooks";
-import { selectMarket, selectAllOrders, selectOpenOrders } from "@/lib/selectors";
+import { selectMarket, selectAllOrders, selectOpenOrders, selectDecoratedFilledOrders } from "@/lib/selectors";
 import { setAllOrders, setCancelledOrders, setFilledOrders } from "@/lib/features/exchange/exchange";
 
 import { openOrders, myOpenOrders, filledOrders, myFilledOrders } from "./data/orders";
@@ -29,6 +29,7 @@ export default function Home() {
   const dispatch = useAppDispatch();
   const selectedMarket = useAppSelector(selectMarket);
   const openedOrders = useAppSelector(selectOpenOrders);
+  const decoratedFilledOrders = useAppSelector(selectDecoratedFilledOrders);
 
   useEffect(() => {
     if (provider && exchange && selectedMarket) {
@@ -110,7 +111,7 @@ export default function Home() {
 
     <section className="transactions">
       <h2>Trades</h2>
-      <Orders />
+      <Orders market={selectedMarket} orders={decoratedFilledOrders} />
     </section>
   </div>)
 }

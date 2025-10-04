@@ -8,7 +8,7 @@ import { selectAccount, selectTokens, selectWalletBalances, selectExchangeBalanc
 
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { setTokens, setBalance } from "@/lib/features/tokens/tokens";
-import { Balances } from "../components/Balances";
+import Balances from "../components/Balances";
 import Transfer from "../components/Transfer";
 
 export default function Home() {
@@ -39,11 +39,11 @@ export default function Home() {
         <h1 className="title">Wallet</h1>
         <section>
             <h2>Wallet Funds</h2>
-            {walletBalances?.length ? <Balances balances={walletBalances.map(({ symbol, wallet }) => ({ symbol, balance: wallet }))} /> : <>No Balances Available</>}
+            {walletBalances?.length ? (<Balances balances={walletBalances.map(({ symbol, wallet }) => ({ symbol, balance: wallet }))} />) : (<>No Balances Available</>)}
         </section>
         <section>
             <h2>Exchange Funds</h2>
-            {exchangeBalances?.length ? <Balances balances={exchangeBalances.map(({ symbol, exchange }) => ({ symbol, balance: exchange }))} /> : <>No Balances Available</>}
+            {exchangeBalances?.length ? (<Balances balances={exchangeBalances.map(({ symbol, exchange }) => ({ symbol, balance: exchange }))} />) : (<>No Balances Available</>)}
         </section>
         <section className="deposit">
             <h2>Deposit</h2>
