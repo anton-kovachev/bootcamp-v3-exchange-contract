@@ -10,7 +10,6 @@ import { setBalance } from "@/lib/features/tokens/tokens";
 
 export default function Transfer({ type, tokens }) {
   const [selectedTokenAddress, setSelectedTokenAddress] = useState(null);
-  const [address, setAddress] = useState(null);
   const { provider } = useProvider();
   const { tokens: tokenContracts } = useTokens();
   const { exchange } = useExchange();
@@ -80,7 +79,6 @@ export default function Transfer({ type, tokens }) {
   }
 
   function canSubmit() {
-    debugger;
     if (type === "deposit") {
       return selectedTokenAddress && tokenAndBalances?.balances?.wallet;
     } else {

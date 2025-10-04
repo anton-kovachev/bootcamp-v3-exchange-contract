@@ -17,7 +17,6 @@ export default function Home() {
     const dispatch = useAppDispatch();
     const account = useAppSelector(selectAccount);
     const tokens = useAppSelector(selectTokens);
-    debugger;
     const walletBalances = useAppSelector(selectWalletBalances);
     const exchangeBalances = useAppSelector(selectExchangeBalances);
 
