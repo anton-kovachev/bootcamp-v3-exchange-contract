@@ -9,6 +9,7 @@ import { selectAccount, selectTokens, selectWalletBalances, selectExchangeBalanc
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { setTokens, setBalance } from "@/lib/features/tokens/tokens";
 import { Balances } from "../components/Balances";
+import Transfer from "../components/Transfer";
 
 export default function Home() {
     const { tokens: tokenContracts } = useTokens();
@@ -16,15 +17,14 @@ export default function Home() {
     const dispatch = useAppDispatch();
     const account = useAppSelector(selectAccount);
     const tokens = useAppSelector(selectTokens);
+    debugger;
     const walletBalances = useAppSelector(selectWalletBalances);
     const exchangeBalances = useAppSelector(selectExchangeBalances);
 
     const getBalances = async () => {
-        debugger
         Object.entries(tokenContracts).forEach(async ([tokenAddress, token], index) => {
             const symbol = await token.symbol();
             const walletBalance = await token.balanceOf(account);
-            debugger;
             const exchangeBalance = await exchange.totalBalanceOf(account, tokenAddress);
             dispatch(setTokens({ index, address: tokenAddress, symbol }));
             dispatch(setBalance({ address: tokenAddress, wallet: ethers.formatUnits(walletBalance, 18), exchange: ethers.formatUnits(exchangeBalance, 18) }));
@@ -32,13 +32,11 @@ export default function Home() {
     }
 
     useEffect(() => {
-        debugger
         if (tokenContracts && exchange && account)
             getBalances();
     }, [tokenContracts, exchange, account]);
 
     return (<div className="page wallet">
-        {console.log(walletBalances)}
         <h1 className="title">Wallet</h1>
         <section>
             <h2>Wallet Funds</h2>
@@ -50,9 +48,11 @@ export default function Home() {
         </section>
         <section className="deposit">
             <h2>Deposit</h2>
+            <Transfer type="deposit" tokens={tokens} />
         </section>
         <section className="withdraw">
             <h2>Withdraw</h2>
+            <Transfer type="withdraw" tokens={tokens} />
         </section>
     </div>);
 }

@@ -38,8 +38,10 @@ function TopNav() {
   };
 
   const getAccountInfo = async () => {
+    debugger;
     const account = await provider.getSigner();
     const balance = await provider.getBalance(account);
+    const network = await provider.getNetwork();
     dispatch(setAccount(account.address));
     dispatch(setBalance(ethers.formatEther(balance)));
   };
