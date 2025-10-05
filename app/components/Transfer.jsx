@@ -95,10 +95,9 @@ export default function Transfer({ type, tokens }) {
           <select
             name="token"
             id={`${type}-token`}
-            defaultValue={selectedTokenAddress ?? 0}
+            value={selectedTokenAddress ?? 0}
             disabled={!tokens?.length}
             onChange={tokenHandler}
-            value={selectedTokenAddress ?? 0}
           >
             <option value={0} disabled>
               Select Token

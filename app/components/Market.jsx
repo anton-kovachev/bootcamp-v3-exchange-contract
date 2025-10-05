@@ -54,7 +54,8 @@ export default function Market() {
       <select
         name="market"
         id="market"
-        defaultValue={marketPairs?.length ? marketPairs[0].id : 0}
+        // defaultValue={marketPairs?.length ? marketPairs[0].id : 0}
+        value={marketPairs?.length ? marketPairs[0].id : 0}
         disabled={!marketPairs?.length}
         onChange={(e) => marketHandler(e.target.value.split(","))}
       >

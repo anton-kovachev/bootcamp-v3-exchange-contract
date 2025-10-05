@@ -11,7 +11,6 @@ import up from "@/app/assets/arrows/price-up.svg";
 import down from "@/app/assets/arrows/price-down.svg";
 
 export default function PriceChart({ market, data }) {
-  console.log(data.series);
   return (
     <div className="chart">
       <div className="flex-between">

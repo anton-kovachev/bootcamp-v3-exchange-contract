@@ -6,7 +6,6 @@ export default function Orders({ market, orders, type }) {
     <div className="table-wrapper">
       {market && orders?.length ? (
         <table>
-          <caption>Trades</caption>
           <thead>
             <tr>
               <th>Time</th>
@@ -26,8 +25,8 @@ export default function Orders({ market, orders, type }) {
                 <td>{x.date}</td>
                 <td className={x.type === "buy" ? "green" : "red"}>
                   {x.type == "buy"
-                    ? +ethers.formatUnits(x.amountGet, 18)
-                    : -ethers.formatUnits(x.amountGive, 18)}
+                    ? `+${ethers.formatUnits(x.amountGet, 18)}`
+                    : `-${ethers.formatUnits(x.amountGive, 18)}`}
                 </td>
                 <td className="red">{x.price}</td>
               </tr>

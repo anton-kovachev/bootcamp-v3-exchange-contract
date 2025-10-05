@@ -1,5 +1,4 @@
-
-"use client"
+"use client";
 
 import { ethers } from "ethers";
 import { useEffect, useRef, useState } from "react";
@@ -8,22 +7,35 @@ import Market from "./components/Market";
 import OrderBook from "./components/OrderBook";
 import Orders from "./components/Orders";
 import Tabs from "./components/Tabs";
-import Chart from "./components/Chart"
+import Chart from "./components/Chart";
+import NewOrder from "./components/NewOrder";
 
 import { useAppSelector } from "@/lib/hooks";
 import { useAppDispatch } from "@/lib/hooks";
-import { selectMarket, selectOpenOrdersFromMarket, selectFilledOrdersFromMarket, selectAccountOpenOrders, selectAccountFilledOrders, selectPriceData } from "@/lib/selectors";
-import { setAllOrders, setFilledOrders } from "@/lib/features/exchange/exchange";
+import {
+  selectMarket,
+  selectOpenOrdersFromMarket,
+  selectFilledOrdersFromMarket,
+  selectAccountOpenOrders,
+  selectAccountFilledOrders,
+  selectPriceData,
+  selectAccount,
+} from "@/lib/selectors";
+import {
+  setAllOrders,
+  setFilledOrders,
+  addNewOrder,
+} from "@/lib/features/exchange/exchange";
 
 import { useExchange } from "./hooks/useExchange";
 import { useProvider } from "./hooks/useProvider";
-
 
 export default function Home() {
   const { provider } = useProvider();
   const { exchange } = useExchange();
 
   const dispatch = useAppDispatch();
+  const account = useAppSelector(selectAccount);
   const selectedMarket = useAppSelector(selectMarket);
   const openedOrdersFromMarket = useAppSelector(selectOpenOrdersFromMarket);
   const filledOrdersFromMarket = useAppSelector(selectFilledOrdersFromMarket);
@@ -35,31 +47,48 @@ export default function Home() {
   const tradeRef = useRef(null);
   const orderRef = useRef(null);
 
+  const buyRef = useRef(null);
+  const sellRef = useRef(null);
+
   const [showMyTransactions, setShowMyTransactions] = useState(false);
+  const [showBuyOrder, setShowBuyOrder] = useState(true);
 
   useEffect(() => {
     if (provider && exchange && selectedMarket) {
-      exchange.filters.OrderCreated()
       getAllOrders();
+
+      exchange.on(
+        "OrderCreated",
+        (id, user, tokenGet, amountGet, tokenGive, amountGive, timestamp) => {
+          const newOrder = {
+            id: id.toString(),
+            user: user,
+            tokenGet: tokenGet,
+            amountGet: amountGet.toString(),
+            tokenGive: tokenGive,
+            amountGive: amountGive.toString(),
+            timestamp: timestamp.toString(),
+          };
+
+          dispatch(addNewOrder(newOrder));
+        }
+      );
     }
   }, [provider, exchange, selectedMarket]);
 
-
-
-
   async function getAllOrders() {
     const block = await provider.getBlockNumber();
-    const orderStream = await exchange.queryFilter('OrderCreated', 0, block);
-    const allOrders = orderStream.map((x) => (x.args));
-    dispatch(setAllOrders(serializeOrders(allOrders)))
+    const orderStream = await exchange.queryFilter("OrderCreated", 0, block);
+    const allOrders = orderStream.map((x) => x.args);
+    dispatch(setAllOrders(serializeOrders(allOrders)));
 
-    // const cancelledOrdersStream = await exchange.queryFilter("OrderCancelled", 0, block);
-    // const cancelledOrders = cancelledOrdersStream.map((x) => (x.args));
-    // dispatch(setCancelledOrders(serializeOrders(cancelledOrders)))
-
-    const filledOrdersStream = await exchange.queryFilter("OrderFilled", 0, block);
-    const filledOrders = filledOrdersStream.map((x) => (x.args));
-    dispatch(setFilledOrders(serializeOrders(filledOrders)))
+    const filledOrdersStream = await exchange.queryFilter(
+      "OrderFilled",
+      0,
+      block
+    );
+    const filledOrders = filledOrdersStream.map((x) => x.args);
+    dispatch(setFilledOrders(serializeOrders(filledOrders)));
   }
 
   function serializeOrders(orders) {
@@ -72,54 +101,95 @@ export default function Home() {
         amountGet: x.amountGet.toString(),
         tokenGive: x.tokenGive,
         amountGive: x.amountGive.toString(),
-        timestamp: x.timestamp.toString()
-      }
-    })
+        timestamp: x.timestamp.toString(),
+      };
+    });
 
     return serializedOrders;
   }
 
-  return (<div className="page trading">
-    <h1 className="title">Trading</h1>
+  return (
+    <div className="page trading">
+      <h1 className="title">Trading</h1>
 
-    <section className="insights">
-      {selectedMarket && priceData ?
-        <Chart market={selectedMarket} data={priceData} /> : <p>Please select a market</p>}
-    </section>
+      <section className="insights">
+        {selectedMarket && priceData ? (
+          <Chart market={selectedMarket} data={priceData} />
+        ) : (
+          <p>Please select a market</p>
+        )}
+      </section>
 
-    <section className="market">
-      <h2>Select Market</h2>
+      <section className="market">
+        <h2>Select Market</h2>
 
-      <Market />
-    </section>
+        <Market />
+      </section>
 
-    <section className="order">
-      <h2>New Order</h2>
+      <section className="order">
+        <h2>New Order</h2>
+        <Tabs
+          tabs={[
+            { name: "Buy", default: true, ref: buyRef },
+            { name: "Sell", ref: sellRef },
+          ]}
+          setCondition={setShowBuyOrder}
+        />
 
-      <Tabs />
+        {account && exchange ? (
+          <NewOrder
+            type={showBuyOrder ? "buy" : "sell"}
+            market={selectedMarket}
+            provider={provider}
+            exchange={exchange}
+          />
+        ) : exchange ? (
+          <p>Please connect your account</p>
+        ) : (
+          <p>Please deploy the exchange</p>
+        )}
+      </section>
 
-      <form></form>
-    </section>
+      <section className="orderbook">
+        <h2>Order Book</h2>
+        {selectMarket ? (
+          <>
+            <OrderBook
+              caption="Selling"
+              market={selectedMarket}
+              orders={openedOrdersFromMarket.sellOrders}
+            />
+            <OrderBook
+              caption="Buying"
+              market={selectedMarket}
+              orders={openedOrdersFromMarket.buyOrders}
+            />
+          </>
+        ) : (
+          <p>Please select a market</p>
+        )}
+      </section>
 
-    <section className="orderbook">
-      <h2>Order Book</h2>
-      {selectMarket ?
-        (<>
-          <OrderBook caption="Selling" market={selectedMarket} orders={openedOrdersFromMarket.sellOrders} />
-          <OrderBook caption="Buying" market={selectedMarket} orders={openedOrdersFromMarket.buyOrders} /></>
-        ) :
-        (<p>Please select a market</p>)}
-    </section>
+      <section className="orders">
+        <h2> {showMyTransactions ? "My Trades" : "My Orders"}</h2>
+        <Tabs
+          tabs={[
+            { name: "Trades", ref: tradeRef },
+            { name: "Orders", default: true, ref: orderRef },
+          ]}
+          setCondition={setShowMyTransactions}
+        />
+        <Orders
+          market={selectedMarket}
+          orders={showMyTransactions ? accountFilledOrders : accountOpenOrders}
+          type={showMyTransactions ? "fill" : "open"}
+        />
+      </section>
 
-    <section className="orders">
-      <h2>My Trades</h2>
-      <Tabs tabs={[{ name: "Trades", ref: tradeRef }, { name: "Orders", default: true, ref: orderRef }]} setCondition={setShowMyTransactions} />
-      <Orders market={selectedMarket} orders={showMyTransactions ? accountFilledOrders : accountOpenOrders} type={showMyTransactions ? "fill" : "open"} />
-    </section>
-
-    <section className="transactions">
-      <h2>Trades</h2>
-      <Orders market={selectedMarket} orders={filledOrdersFromMarket} />
-    </section>
-  </div>)
+      <section className="transactions">
+        <h2>Trades</h2>
+        <Orders market={selectedMarket} orders={filledOrdersFromMarket} />
+      </section>
+    </div>
+  );
 }
