@@ -12,14 +12,11 @@ import Chart from "./components/Chart"
 
 import { useAppSelector } from "@/lib/hooks";
 import { useAppDispatch } from "@/lib/hooks";
-import { selectMarket, selectAllOrders, selectOpenOrders, selectDecoratedFilledOrders } from "@/lib/selectors";
-import { setAllOrders, setCancelledOrders, setFilledOrders } from "@/lib/features/exchange/exchange";
+import { selectMarket, selectOpenOrdersFromMarket, selectFilledOrdersFromMarket, selectAccountOpenOrders, selectAccountFilledOrders, selectPriceData } from "@/lib/selectors";
+import { setAllOrders, setFilledOrders } from "@/lib/features/exchange/exchange";
 
-import { openOrders, myOpenOrders, filledOrders, myFilledOrders } from "./data/orders";
 import { useExchange } from "./hooks/useExchange";
 import { useProvider } from "./hooks/useProvider";
-
-import config from "@/app/config.json"
 
 
 export default function Home() {
@@ -28,8 +25,17 @@ export default function Home() {
 
   const dispatch = useAppDispatch();
   const selectedMarket = useAppSelector(selectMarket);
-  const openedOrders = useAppSelector(selectOpenOrders);
-  const decoratedFilledOrders = useAppSelector(selectDecoratedFilledOrders);
+  const openedOrdersFromMarket = useAppSelector(selectOpenOrdersFromMarket);
+  const filledOrdersFromMarket = useAppSelector(selectFilledOrdersFromMarket);
+  const priceData = useAppSelector(selectPriceData);
+
+  const accountOpenOrders = useAppSelector(selectAccountOpenOrders);
+  const accountFilledOrders = useAppSelector(selectAccountFilledOrders);
+
+  const tradeRef = useRef(null);
+  const orderRef = useRef(null);
+
+  const [showMyTransactions, setShowMyTransactions] = useState(false);
 
   useEffect(() => {
     if (provider && exchange && selectedMarket) {
@@ -37,6 +43,8 @@ export default function Home() {
       getAllOrders();
     }
   }, [provider, exchange, selectedMarket]);
+
+
 
 
   async function getAllOrders() {
@@ -55,8 +63,6 @@ export default function Home() {
   }
 
   function serializeOrders(orders) {
-    debugger
-    console.log("Orders ", orders);
     let serializedOrders = [];
     orders.forEach((x) => {
       serializedOrders[Number(x.id) - 1] = {
@@ -77,7 +83,8 @@ export default function Home() {
     <h1 className="title">Trading</h1>
 
     <section className="insights">
-      <Chart />
+      {selectedMarket && priceData ?
+        <Chart market={selectedMarket} data={priceData} /> : <p>Please select a market</p>}
     </section>
 
     <section className="market">
@@ -98,20 +105,21 @@ export default function Home() {
       <h2>Order Book</h2>
       {selectMarket ?
         (<>
-          <OrderBook caption="Selling" market={selectedMarket} orders={openedOrders.sellOrders} />
-          <OrderBook caption="Buying" market={selectedMarket} orders={openedOrders.buyOrders} /></>
+          <OrderBook caption="Selling" market={selectedMarket} orders={openedOrdersFromMarket.sellOrders} />
+          <OrderBook caption="Buying" market={selectedMarket} orders={openedOrdersFromMarket.buyOrders} /></>
         ) :
         (<p>Please select a market</p>)}
     </section>
 
     <section className="orders">
-      <h2>My Trads</h2>
-      <Orders />
+      <h2>My Trades</h2>
+      <Tabs tabs={[{ name: "Trades", ref: tradeRef }, { name: "Orders", default: true, ref: orderRef }]} setCondition={setShowMyTransactions} />
+      <Orders market={selectedMarket} orders={showMyTransactions ? accountFilledOrders : accountOpenOrders} type={showMyTransactions ? "fill" : "open"} />
     </section>
 
     <section className="transactions">
       <h2>Trades</h2>
-      <Orders market={selectedMarket} orders={decoratedFilledOrders} />
+      <Orders market={selectedMarket} orders={filledOrdersFromMarket} />
     </section>
   </div>)
 }
