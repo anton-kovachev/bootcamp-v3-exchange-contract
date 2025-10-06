@@ -1,7 +1,24 @@
 "use client";
 import { ethers } from "ethers";
+import { useProvider } from "../hooks/useProvider";
+import { useExchange } from "../hooks/useExchange";
 
 export default function Orders({ market, orders, type }) {
+  const { provider } = useProvider();
+  const { exchange } = useExchange();
+
+  async function cancelHandler(order) {
+    try {
+      debugger;
+      const signer = await provider.getSigner();
+
+      const transaction = await exchange.connect(signer).cancelOrder(order.id);
+      await transaction.wait();
+    } catch (e) {
+      console.log("Order cancel failed ", e);
+    }
+  }
+
   return (
     <div className="table-wrapper">
       {market && orders?.length ? (
@@ -17,6 +34,7 @@ export default function Orders({ market, orders, type }) {
             {orders?.map((x, index) => (
               <tr
                 key={index}
+                onClick={type === "open" && (() => cancelHandler(x))}
                 role={type === "open" ? "link" : undefined}
                 tabIndex={type === "open" ? 0 : -1}
                 aria-label={type === "open" ? "Fill Order" : undefined}

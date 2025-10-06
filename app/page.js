@@ -25,6 +25,7 @@ import {
   setAllOrders,
   setFilledOrders,
   addNewOrder,
+  cancelOrder,
 } from "@/lib/features/exchange/exchange";
 
 import { useExchange } from "./hooks/useExchange";
@@ -57,24 +58,40 @@ export default function Home() {
     if (provider && exchange && selectedMarket) {
       getAllOrders();
 
-      exchange.on(
-        "OrderCreated",
-        (id, user, tokenGet, amountGet, tokenGive, amountGive, timestamp) => {
-          const newOrder = {
-            id: id.toString(),
-            user: user,
-            tokenGet: tokenGet,
-            amountGet: amountGet.toString(),
-            tokenGive: tokenGive,
-            amountGive: amountGive.toString(),
-            timestamp: timestamp.toString(),
-          };
+      exchange.on("OrderCreated", orderChangeHandler("create"));
 
-          dispatch(addNewOrder(newOrder));
-        }
-      );
+      exchange.on("OrderCancelled", orderChangeHandler("cancel"));
     }
   }, [provider, exchange, selectedMarket]);
+
+  function orderChangeHandler(type) {
+    return (
+      id,
+      user,
+      tokenGet,
+      amountGet,
+      tokenGive,
+      amountGive,
+      timestamp
+    ) => {
+      debugger;
+      const order = {
+        id: id.toString(),
+        user: user,
+        tokenGet: tokenGet,
+        amountGet: amountGet.toString(),
+        tokenGive: tokenGive,
+        amountGive: amountGive.toString(),
+        timestamp: timestamp.toString(),
+      };
+
+      if (type === "create") {
+        dispatch(addNewOrder(order));
+      } else if (type === "cancel") {
+        dispatch(cancelOrder(order));
+      }
+    };
+  }
 
   async function getAllOrders() {
     const block = await provider.getBlockNumber();
