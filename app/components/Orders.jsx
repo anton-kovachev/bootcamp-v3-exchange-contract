@@ -34,19 +34,21 @@ export default function Orders({ market, orders, type }) {
             {orders?.map((x, index) => (
               <tr
                 key={index}
-                onClick={type === "open" && (() => cancelHandler(x))}
+                onClick={type === "open" ? () => cancelHandler(x) : undefined}
                 role={type === "open" ? "link" : undefined}
                 tabIndex={type === "open" ? 0 : -1}
                 aria-label={type === "open" ? "Fill Order" : undefined}
                 className={type === "open" ? "hover-red" : undefined}
               >
                 <td>{x.date}</td>
-                <td className={x.type === "buy" ? "green" : "red"}>
+                <td className={x.type === "buy" ? "red" : "green"}>
                   {x.type == "buy"
-                    ? `+${ethers.formatUnits(x.amountGet, 18)}`
-                    : `-${ethers.formatUnits(x.amountGive, 18)}`}
+                    ? `-${ethers.formatUnits(x.amountGet, 18)}`
+                    : `+${ethers.formatUnits(x.amountGive, 18)}`}
                 </td>
-                <td className="red">{x.price}</td>
+                <td className={x.type === "buy" ? "red" : "green"}>
+                  {x.price}
+                </td>
               </tr>
             ))}
           </tbody>

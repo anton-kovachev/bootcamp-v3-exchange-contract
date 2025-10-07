@@ -1063,6 +1063,11 @@ form input[type="submit"]:hover {
   font-weight: 300;
 }
 
+.swap .cancel-container {
+  display: flex;
+  justify-content: center;
+}
+
 .swap .cancel {
   width: max-content;
   margin: 0 auto;

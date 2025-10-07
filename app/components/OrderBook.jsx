@@ -1,9 +1,25 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { ethers } from "ethers";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { setOrderToFill } from "@/lib/features/exchange/exchange";
+import { selectOpenOrdersFromMarket } from "@/lib/selectors";
 
 export default function OrderBook({ caption, market, orders }) {
   const formatAamount = (amount) => ethers.formatUnits(amount, 18);
+
+  const dispatch = useAppDispatch();
+  const openOrdersFromMarket = useAppSelector(selectOpenOrdersFromMarket);
+  const router = useRouter();
+
+  function selectOrderHandler(order) {
+    if (order) {
+      dispatch(setOrderToFill(order));
+      router.push("/swap");
+    }
+  }
+
   return (
     <div className="table-wrapper">
       {market?.length && (
@@ -29,7 +45,13 @@ export default function OrderBook({ caption, market, orders }) {
 
           <tbody>
             {orders.map((order, index) => (
-              <tr key={index} role="link" tabIndex={0} aria-label="Fill Order">
+              <tr
+                key={index}
+                role="link"
+                tabIndex={0}
+                aria-label="Fill Order"
+                onClick={(e) => selectOrderHandler(order)}
+              >
                 <td className={caption == "Selling" ? "gray" : undefined}>
                   {formatAamount(order.amountGet)}
                 </td>

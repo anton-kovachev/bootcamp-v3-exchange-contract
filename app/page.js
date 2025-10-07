@@ -26,6 +26,7 @@ import {
   setFilledOrders,
   addNewOrder,
   cancelOrder,
+  addNewFilledOrder,
 } from "@/lib/features/exchange/exchange";
 
 import { useExchange } from "./hooks/useExchange";
@@ -61,6 +62,39 @@ export default function Home() {
       exchange.on("OrderCreated", orderChangeHandler("create"));
 
       exchange.on("OrderCancelled", orderChangeHandler("cancel"));
+
+      exchange.on(
+        "OrderFilled",
+        (
+          id,
+          user,
+          tokenGet,
+          amountGet,
+          tokenGive,
+          amountGive,
+          creator,
+          timestamp
+        ) => {
+          const order = {
+            id: id.toString(),
+            user,
+            tokenGet,
+            amountGet: amountGet.toString(),
+            tokenGive,
+            amountGive: amountGive.toString(),
+            timestamp: timestamp.toString(),
+            creator,
+          };
+
+          dispatch(addNewFilledOrder(order));
+        }
+      );
+
+      return () => {
+        exchange.off("OrderCreated");
+        exchange.off("OrderCancelled");
+        exchange.off("OrderFilled");
+      };
     }
   }, [provider, exchange, selectedMarket]);
 
@@ -74,7 +108,6 @@ export default function Home() {
       amountGive,
       timestamp
     ) => {
-      debugger;
       const order = {
         id: id.toString(),
         user: user,
