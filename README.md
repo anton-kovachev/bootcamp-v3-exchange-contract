@@ -1,4 +1,4 @@
-# DAAP Exchange Smart Contract Project
+# DEX Exchange Smart Contract Project
 
 A decentralized exchange (DEX) smart contract project built with Hardhat, featuring token trading, liquidity provision, and flash loan functionality.
 
