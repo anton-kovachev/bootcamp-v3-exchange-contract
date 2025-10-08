@@ -20,6 +20,7 @@ contract Exchange is FlashLoanProvider {
     );
 
     event OrderCreated(
+        uint256 id,
         address indexed user,
         address indexed tokenGet,
         uint256 amountGet,
@@ -29,6 +30,7 @@ contract Exchange is FlashLoanProvider {
     );
 
     event OrderCancelled(
+        uint256 id,
         address indexed user,
         address indexed tokenGet,
         uint256 amountGet,
@@ -88,8 +90,8 @@ contract Exchange is FlashLoanProvider {
     }
 
     function activeBalanceOf(
-        address _token,
-        address _user
+        address _user,
+        address _token
     ) public view returns (uint256 activeAmount) {
         return userActiveTotalBalance[_user][_token];
     }
@@ -143,7 +145,7 @@ contract Exchange is FlashLoanProvider {
     ) public {
         require(
             totalBalanceOf(msg.sender, _tokenGive) >=
-                activeBalanceOf(_tokenGive, msg.sender) + _amountGive,
+                activeBalanceOf(msg.sender, _tokenGive) + _amountGive,
             "Exchange: Insufficient token balance."
         );
 
@@ -161,6 +163,7 @@ contract Exchange is FlashLoanProvider {
         userActiveTotalBalance[msg.sender][_tokenGive] += _amountGive;
 
         emit OrderCreated(
+            orderCount,
             msg.sender,
             _tokenGet,
             _amountGet,
@@ -168,7 +171,6 @@ contract Exchange is FlashLoanProvider {
             _amountGive,
             block.timestamp
         );
-        // userOrders[msg.sender].push(orderCount);
     }
 
     function cancelOrder(uint256 _id) public {
@@ -187,6 +189,7 @@ contract Exchange is FlashLoanProvider {
         userActiveTotalBalance[msg.sender][order.tokenGive] -= order.amountGive;
 
         emit OrderCancelled(
+            orderCount,
             msg.sender,
             order.tokenGet,
             order.amountGet,

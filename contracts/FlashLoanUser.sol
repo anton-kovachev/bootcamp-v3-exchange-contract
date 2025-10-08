@@ -20,10 +20,10 @@ contract FlashLoanUser is IFlashLoanReceiver {
     }
 
     function getFlashLoan(address _token, uint256 _amount) external {
-        require(
-            msg.sender == owner,
-            "FlashLoanUser: Only owner can request flash loans"
-        );
+        // require(
+        //     msg.sender == owner,
+        //     "FlashLoanUser: Only owner can request flash loans"
+        // );
         Exchange(exchange).flashLoan(_token, _amount, "");
     }
 

@@ -100,7 +100,7 @@ describe("Exchange", () => {
                 const AMOUNT = tokens(1);
                 const { timestamp } = await ethers.provider.getBlock();
 
-                await expect(transaction).to.emit(exchange, "OrderCreated").withArgs(user1.address, await token1.getAddress(), AMOUNT, await token0.getAddress(), AMOUNT, timestamp);
+                await expect(transaction).to.emit(exchange, "OrderCreated").withArgs(1, user1.address, await token1.getAddress(), AMOUNT, await token0.getAddress(), AMOUNT, timestamp);
             })
         })
 
