@@ -75,7 +75,7 @@ npx hardhat ignition deploy ./ignition/modules/FlashLoanUser.js --network localh
 
 ### 4. Update Contract Addresses
 
-After deployment, update the contract addresses in the seed script (`scripts/seed.js`) with the address of the contract on your local Hardhat network node:
+After deployment, update the contract addresses in the seed script (`scripts/seed.js`):
 
 ```javascript
 const DAPPU_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
