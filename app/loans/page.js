@@ -43,7 +43,6 @@ export default function Home() {
 
   async function fetchFlashLoans() {
     const blockNumber = await provider.getBlockNumber();
-    debugger;
     const loansStream = await exchange.queryFilter("FlashLoan", 0, blockNumber);
     dispatch(
       setFlashLoans(

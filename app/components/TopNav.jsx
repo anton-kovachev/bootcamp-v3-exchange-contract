@@ -21,7 +21,7 @@ function TopNav() {
 
   const networkHandler = async (event) => {
     await metamask.request({
-      method: "wallet_switchEhtereumChain",
+      method: "wallet_switchEthereumChain",
       params: [{ chainId: event.target.value }],
     });
   };
@@ -77,6 +77,7 @@ function TopNav() {
           >
             <option value="0">Select</option>
             <option value="0x7a69">Hardhat</option>
+            <option value="0x4">Tenderly</option>
           </select>
         </div>
       </div>
